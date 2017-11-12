@@ -1,0 +1,131 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Oct  5 16:52:17 2017
+
+@author: gpranith
+"""
+
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Sep 28 11:12:40 2017
+
+@author: gpranith
+"""
+
+
+"""
+Created on Thu Sep 21 16:33:48 2017
+
+@author: gpranith
+"""
+# Lbraries
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Importing the dataset
+dataset = pd.read_csv('AP53001.csv')
+X = dataset.iloc[:, [1,2,3,4,5,6,7,8 ]].values
+y = dataset.iloc[:, 0].values
+
+
+# Taking care of missing data
+from sklearn.preprocessing import Imputer
+imputer = Imputer(missing_values = 'NaN', strategy = 'mean', axis = 0)
+imputer = imputer.fit(X[:, 1:8])
+X[:, 1:8] = imputer.transform(X[:, 1:8])
+
+# Encoding the Independent Variable
+from sklearn.preprocessing import LabelEncoder
+labelencoder_y = LabelEncoder()
+y = labelencoder_y.fit_transform(y)
+
+
+# Splitting the dataset into the Training set and Test set
+from sklearn.cross_validation import train_test_split
+X_train1, X_test1, y_train1, y_test1 = train_test_split(X, y, test_size = 0.85, random_state = 0)
+
+# Feature Scaling
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train1 = sc.fit_transform(X_train1)
+X_test1 = sc.transform(X_test1)
+
+
+# Fitting Logistic Regression to the Training set
+#from sklearn.linear_model import LogisticRegression
+#classifier = LogisticRegression(random_state = 0)
+#classifier.fit(X_train, y_train)
+
+#SVM
+#from sklearn.svm import SVC
+#classifier = SVC(kernel = 'linear', random_state = 0)
+#classifier.fit(X_train, y_train)
+
+#KNN
+#from sklearn.neighbors import KNeighborsClassifier
+#classifier = KNeighborsClassifier(n_neighbors = 5, metric = 'minkowski', p = 2)
+#classifier.fit(X_train, y_train)
+
+#RandomForest --- Best so far
+from sklearn.ensemble import RandomForestClassifier
+classifier = RandomForestClassifier(n_estimators = 10, criterion = 'entropy', random_state = 0)
+classifier.fit(X_train, y_train)
+
+# Predicting the Test set results
+y_pred = classifier.predict(X_test)
+
+
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y_test, y_pred)
+
+#K-cross Validation
+from sklearn.cross_validation import cross_val_score
+accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
+accuracies.mean()
+accuracies.std()
+
+
+
+# New Test
+
+dataset1 = pd.read_csv('AP53002.csv')
+X1 = dataset1.iloc[:, [1,2,3,4,5,6,7,8 ]].values
+y1 = dataset1.iloc[:, 0].values
+
+
+from sklearn.preprocessing import Imputer
+imputer = Imputer(missing_values = 'NaN', strategy = 'mean', axis = 0)
+imputer = imputer.fit(X1[:, 1:8])
+X1[:, 1:8] = imputer.transform(X1[:, 1:8])
+
+
+from sklearn.preprocessing import LabelEncoder
+labelencoder_y = LabelEncoder()
+y1 = labelencoder_y.fit_transform(y1)
+
+
+
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+X_train1 = sc.fit_transform(X_train1)
+X_test1 = sc.transform(X_test1)
+
+
+y_pred1 = classifier.predict(X_test1)
+
+
+# Making the Confusion Matrix
+from sklearn.metrics import confusion_matrix
+cm1 = confusion_matrix(y_test1, y_pred1)
+
+#K-cross Validation
+from sklearn.cross_validation import cross_val_score
+accuracies = cross_val_score(estimator = classifier, X = X_test1, y = y_test1, cv = 10)
+accuracies.mean()
+accuracies.std()
+
+
+
